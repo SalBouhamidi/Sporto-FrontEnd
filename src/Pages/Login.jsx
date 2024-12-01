@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axios, { Axios } from "axios";
+import axios from "axios";
+
 
 
 export default function Login() {
@@ -15,10 +16,9 @@ export default function Login() {
             if(!response){
                 return "smth went wrong"
             }
-            toast.success("You have logged in successfully")
-
-
-
+            toast.success("You have logged in successfully");
+            localStorage.setItem("UserToken", response.data.token);
+            setTimeout(()=>Navigate('/dashboard'), 1000)
         }catch(e){
             console.log(e);
         }
@@ -45,11 +45,7 @@ export default function Login() {
                         </span>
                     </div>
                 </div>
-                <div className="lg:w-1/2 w-full flex items-center justify-center text-center md:px-16 px-0 z-0" style={{
-                    backgroundImage: `url(${background})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                }} >
+                <div className="lg:w-1/2 w-full flex items-center justify-center text-center md:px-16 px-0 z-0" style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center'}} >
                     <div className="absolute lg:hidden z-10 inset-0 bg-no-repeat bg-cover items-center" >
                         <div className="absolute bg-orange-600 opacity-60 inset-0 z-0"></div>
                     </div>
