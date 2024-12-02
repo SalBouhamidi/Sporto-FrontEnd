@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SideBar from "./Layouts/SideBar";
 import { Toaster, toast } from "sonner";
 import AddNewEvent from "../Components/Dashboard/addNewEvent";
 import ShowEvents from "../Components/Dashboard/ShowEvents"
-
+import axios from "axios";
+import EventDetails from "../Components/Dashboard/eventDetails"
 const tabs = [
     { id: "dashboard", title: "Dashboard", icon: "ti ti-home" },
     { id: "event", title: "My Event", icon: "ti ti-settings" },
@@ -13,6 +14,26 @@ const tabs = [
 function Dashboard() {
     const [activeTab, setActiveTab] = useState("dashboard");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [events, setEvents] = useState([]);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+
+    useEffect(() => {
+        async function myEvents() {
+            try {
+                let results = await axios.get('http://localhost:3000/events', {
+                    headers: {
+                        authorization: localStorage.getItem('UserToken')
+                    }
+                })
+                setEvents(results?.data)
+                // console.log(results?.data)
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        myEvents()
+
+    }, [])
 
     return (
         
@@ -37,10 +58,16 @@ function Dashboard() {
                         </div>
                         {isModalOpen && (
                             <>
-                            <AddNewEvent setIsModalOpen={setIsModalOpen}/>
-                            <ShowEvents/>
+                            <AddNewEvent setIsModalOpen={setIsModalOpen} setEvents={setEvents}/>
                             </>
                         )}
+                        {!selectedEvent ?(
+                            <ShowEvents events={events} setEvents={setEvents} setSelectedEvent={setSelectedEvent}/>
+
+                        ):(
+                           <EventDetails id={selectedEvent} onBack={() => setSelectedEvent(null)}/> 
+                        )}
+
                     </div>
                 )}
             </div>

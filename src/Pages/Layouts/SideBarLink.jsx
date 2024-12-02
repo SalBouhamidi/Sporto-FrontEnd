@@ -10,9 +10,7 @@ function SidebarLink({ title, isActive, onClick }) {
     <li>
       <button
         onClick={onClick}
-        className={`
-          w-full px-4 py-3 flex items-center space-x-3 rounded-lg
-          transition-all duration-200 ease-in-out
+        className={`w-full px-4 py-3 flex items-center space-x-3 rounded-lg transition-all duration-200 ease-in-out
           ${isActive 
             ? 'bg-orange-600 text-white shadow-lg' 
             : 'text-gray-400 hover:bg-gray-800 hover:text-white'

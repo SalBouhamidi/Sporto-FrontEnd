@@ -1,21 +1,17 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "sonner";
-export default function AddNewEvent({ setIsModalOpen }) {
+export default function AddNewEvent({ setIsModalOpen, setEvents }) {
     const { register, handleSubmit, formState: { errors } } = useForm({ mode: "onChange", })
     function validateDate(value) {
         let today = new Date();
         let Eventdate = new Date(value);
-        // console.log("this is the date of event",Eventdate);
-        // console.log("this is today date", today)
         if (Eventdate <= today) {
-            // toast.error('The date is not valid, please provide a valid date in the future');
             return 'The date is not valid, please provide a valid date in the future';
         }
         return true;
     }
     async function handleCreatingEvent(data) {
-        console.log(data);
         try {
             let result = await axios.post('http://localhost:3000/events/create', data, {
                 headers: {
@@ -26,7 +22,14 @@ export default function AddNewEvent({ setIsModalOpen }) {
             if (result?.data == "The date is invalid ") {
                 toast.error('date is not valid')
             } else {
-                setIsModalOpen(false)
+                setIsModalOpen(false);
+                console.log(data);
+                const formattedData = {
+                    ...data,
+                    date: new Date(data.date).toISOString(),
+                };
+    
+                setEvents((prevState) => [...prevState, formattedData]);
                 return toast.success('your event was made successfully')
             }
 
@@ -52,6 +55,7 @@ export default function AddNewEvent({ setIsModalOpen }) {
                             </span>
                         </button>
                     </div>
+                    
                     <div className="p-4 md:p-5">
                         <form onSubmit={handleSubmit(handleCreatingEvent)} className="space-y-4">
                             <div>
