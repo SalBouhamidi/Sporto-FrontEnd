@@ -4,6 +4,7 @@ import { Toaster, toast } from "sonner";
 import { UserMinus, RefreshCw } from "lucide-react"
 import { useForm } from "react-hook-form";
 import UpdateParticipant from "../Dashboard/UpdateParticipant"
+import { jsPDF } from 'jspdf';
 export default function EventDetails({ id, onBack }) {
   const [eventDetails, setEventDetails] = useState({})
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -11,8 +12,7 @@ export default function EventDetails({ id, onBack }) {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isparticipant, setParticipant] = useState('');
   const [isParticipantUpdateOpen, setParticipantUpdateOpen] = useState(false);
-  const [isListParticipants, setListParticipants] = useState([])
-  const [isModelListParticipant,setModelListParticipant] = useState()
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -132,27 +132,27 @@ export default function EventDetails({ id, onBack }) {
       toast.error('Ops Something bad happend, kindly try again');
     }
   }
-  function handleupdateParticipant(participant){
+  function handleupdateParticipant(participant) {
     setParticipantUpdateOpen(true);
     setParticipant(participant);
   }
-
- async function handleListofParticipant(){
+  function generatePDF(){
     if(eventDetails?.participants.length > 0){
-      try{
-      setListParticipants(eventDetails.participants)
-      // console.log(eventDetails.participants)
-      // console.log(isListParticipants);
-      setModelListParticipant(true);
-      }catch(e){
-      console.log('error while generating list of participant: ', e)
-    }
-    }else{
-      toast.error('this event has no participant')
-    }
-  }
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text(`Liste des Participants of ${eventDetails.name}`, 20, 20);
 
-  
+    doc.setFontSize(12);
+    let yPosition = 30; 
+    eventDetails.participants.forEach((participant, index) => {
+      doc.text(`${index + 1}. ${participant.firstName} ${participant.lastName} - ${participant.phoneNumber} - ${participant.email}`, 20, yPosition);
+      yPosition += 10;
+    });
+    doc.save(`participants_${eventDetails.name}.pdf`);
+    }else{
+      toast.error("there's no participants yet ")
+    }
+  };
 
   return (
     <>
@@ -168,7 +168,7 @@ export default function EventDetails({ id, onBack }) {
                 <button onClick={() => setModalUpdateOpen(true)} className="block text-white bg-orange-500 px-4 py-2 rounded mb-4">
                   Update Event
                 </button >
-                <button onClick={handleListofParticipant} className="block text-white bg-orange-500 px-4 py-2 rounded mb-4">
+                <button onClick={generatePDF} className="block text-white bg-orange-500 px-4 py-2 rounded mb-4">
                   list of participant
                 </button>
               </div>
@@ -321,29 +321,7 @@ export default function EventDetails({ id, onBack }) {
           {isParticipantUpdateOpen && (
             <UpdateParticipant setParticipantUpdateOpen={setParticipantUpdateOpen} eventId={eventDetails._id} participant={isparticipant} />
           )}
-          {isModelListParticipant && (
-                  <div className="fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-50" onClick={() => setModelListParticipant(false)} >
-                  <div onClick={(e) => e.stopPropagation()} className="bg-white p-6 rounded shadow-lg w-[60%] max-h-[80vh] overflow-y-auto">
-                    <div className="flex justify-center ">
-                      <h2 className="text-xl font-bold mb-4">List of participant</h2>
-                    </div>
-                    <div>
-                      {console.log(isListParticipants)}
-                      {isListParticipants.length > 0 &&(
-                                          isListParticipants.map((participant) => (
-                                            <div key={participant._id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                                              <div>
-                                                <p className="font-medium">{participant.firstName} {participant.lastName}</p>
-                                                <p className="text-sm text-gray-600">{participant.email}</p>
-                                                <p className="text-xs text-gray-500">Joined: {participant.phoneNumber}</p>
-                                              </div>
-                                            </div>
-                                          ))
-                      )}
-                    </div>
-                    </div>
-                    </div>
-          )}
+
 
 
 
