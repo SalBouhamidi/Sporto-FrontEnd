@@ -26,7 +26,6 @@ function Dashboard() {
                     }
                 })
                 setEvents(results?.data)
-                // console.log(results?.data)
             } catch (e) {
                 console.log(e)
             }
